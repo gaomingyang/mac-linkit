@@ -35,6 +35,47 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc func linkIt() {
         print("link it")
+        
+        if let items = NSPasteboard.general.pasteboardItems {
+            for item in items {
+                for type in item.types{
+                    if type == NSPasteboard.PasteboardType("public.utf8-plain-text") {
+                        if let url = item.string(forType: type) {
+                            print(url)
+                            
+                            var actualUrl = ""
+                            
+                            if url.hasPrefix("http://") || url.hasPrefix("https://") {
+                                actualUrl = url
+                            } else {
+                                //actualUrl = "http://" + url
+                                actualUrl = "http://\(url)"
+                            }
+                            
+                            NSPasteboard.general.clearContents()  //清空剪贴板
+                            NSPasteboard.general.setString("<a href=\"\(actualUrl)\">\(url)</a>", forType: NSPasteboard.PasteboardType("public.html")) //对于支持富文本的，取html内容时，获得带链接的html内容
+                            NSPasteboard.general.setString(url, forType: NSPasteboard.PasteboardType("public.utf8-plain-text")) //对于不支持富文本的，只能从剪贴板获得utf8字符串
+                        }
+
+                    }
+
+                }
+            }
+        }
+        
+        //printPasteboard()
+    }
+    
+    func printPasteboard() {
+        if let items = NSPasteboard.general.pasteboardItems {
+            for item in items {
+                for type in item.types{
+                    // print(type)
+                    print("Type: \(type)")
+                    print("String: \(String(describing: item.string(forType: type)))")
+                }
+            }
+        }
     }
     
     @objc func quit() {
